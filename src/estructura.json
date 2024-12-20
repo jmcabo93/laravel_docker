@@ -1,0 +1,14 @@
+{
+  "user_id": 1,
+  "status": "pending",
+  "products": [
+    {
+      "product_id": 1,
+      "quantity": 1
+    },
+    {
+      "product_id": 3,
+      "quantity": 1
+    }
+  ]
+}
