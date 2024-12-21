@@ -51,7 +51,7 @@ class CategoryController extends Controller
      *         required=true,
      *         @OA\MediaType(
      *             mediaType="application/json",
-     *             @OA\Schema(ref="#/components/schemas/CategoryRequest")
+     *             @OA\Schema(ref="#/components/schemas/Category")
      *         )
      *     ),
      *     @OA\Response(
@@ -127,7 +127,7 @@ class CategoryController extends Controller
      *         required=true,
      *         @OA\MediaType(
      *             mediaType="application/json",
-     *             @OA\Schema(ref="#/components/schemas/CategoryRequest")
+     *             @OA\Schema(ref="#/components/schemas/Category")
      *         )
      *     ),
      *     @OA\Response(

@@ -56,14 +56,9 @@ class ProductController extends Controller
      *     security={{"bearerAuth": {}}},     
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name", "price", "stock", "category_id"},
-     *             @OA\Property(property="name", type="string", example="Producto 1"),
-     *             @OA\Property(property="description", type="string", example="Descripción del producto"),
-     *             @OA\Property(property="price", type="number", format="float", example="99.99"),
-     *             @OA\Property(property="stock", type="integer", example=100),
-     *             @OA\Property(property="category_id", type="integer", example=1),
-     *             @OA\Property(property="image", type="string", format="binary", example="image.jpg")
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(ref="#/components/schemas/Product")
      *         )
      *     ),
      *     @OA\Response(
@@ -137,14 +132,9 @@ class ProductController extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"name", "price", "stock", "category_id"},
-     *             @OA\Property(property="name", type="string", example="Producto 1"),
-     *             @OA\Property(property="description", type="string", example="Descripción actualizada del producto"),
-     *             @OA\Property(property="price", type="number", format="float", example="99.99"),
-     *             @OA\Property(property="stock", type="integer", example=100),
-     *             @OA\Property(property="category_id", type="integer", example=1),
-     *             @OA\Property(property="image", type="string", format="binary", example="image.jpg")
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(ref="#/components/schemas/Product")
      *         )
      *     ),
      *     @OA\Response(
