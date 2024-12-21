@@ -8,4 +8,10 @@ export default defineConfig({
             'resources/js/app.js',
         ]),
     ],
+    server: {
+    proxy: {
+      '/app': 'http://localhost',
+    }
+  }
 });
+

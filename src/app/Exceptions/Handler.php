@@ -40,14 +40,23 @@ class Handler extends ExceptionHandler
     }
 
     public function render($request, Throwable $exception)
-{
-    if ($exception instanceof \Illuminate\Validation\ValidationException) {
-        return response()->json([
+   {
+
+    if ($exception instanceof ValidationException) {
+        
+        if ($request->expectsJson()) {
+
+            return response()->json([
             'message' => 'Datos no válidos.',
             'errors' => $exception->errors(),
-        ], 422); // 422 es el código de estado para validación incorrecta
+            ], 422);
+        }
+
+        return redirect()->back()->withErrors($exception->errors())->withInput();
     }
 
+    // Maneja otras excepciones de manera predeterminada
     return parent::render($request, $exception);
+
 }
 }
