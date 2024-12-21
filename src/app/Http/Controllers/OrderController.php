@@ -5,17 +5,38 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
-use App\Http\Requests\OrderRequest;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 
+/**
+ * @OA\Tag(
+ *     name="Orders",
+ *     description="Operaciones sobre las órdenes"
+ * )
+ */
 class OrderController extends Controller
 {
     /**
      * Obtener la lista de todas las órdenes (paginadas).
      *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *     path="/api/orders",
+     *     summary="Obtener la lista de todas las órdenes",
+     *     tags={"Orders"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de órdenes paginada",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="current_page", type="integer", example=1),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Order")),
+     *             @OA\Property(property="total", type="integer", example=100),
+     *             @OA\Property(property="per_page", type="integer", example=10)
+     *         )
+     *     )
+     * )
      */
     public function index()
     {
@@ -26,8 +47,31 @@ class OrderController extends Controller
     /**
      * Almacenar una nueva orden.
      *
-     * @param  \App\Http\Requests\OrderRequest  $request
-     * @return \Illuminate\Http\Response
+     * @OA\Post(
+     *     path="/api/orders",
+     *     summary="Almacenar una nueva orden",
+     *     tags={"Orders"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(ref="#/components/schemas/Order")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Orden creada exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/Order")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Stock insuficiente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Stock insuficiente para el producto 123")
+     *         )
+     *     )
+     * )
      */
     public function store(Request $request)
     {
@@ -37,8 +81,8 @@ class OrderController extends Controller
             // Crear la orden
             $order = Order::create([
                 'user_id' => $request->user_id,
-                'status' =>  'pending',
-                'total_amount' =>0,
+                'status' => 'pending',
+                'total_amount' => 0,
             ]);
 
             // Inicializar el total_amount
@@ -88,57 +132,87 @@ class OrderController extends Controller
     /**
      * Mostrar los detalles de una orden específica.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *     path="/api/orders/{id}",
+     *     summary="Mostrar los detalles de una orden específica",
+     *     tags={"Orders"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la orden",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Detalle de la orden",
+     *         @OA\JsonContent(ref="#/components/schemas/Order")
+     *     )
+     * )
      */
     public function show($id)
     {
-        // Obtener la orden por ID
         $order = Order::findOrFail($id);
-
-        // Cargar los items de la orden
         $order->load('orderItems.product');
-
-        // Retornar la orden con los productos asociados
         return response()->json($order, Response::HTTP_OK);
     }
 
     /**
      * Actualizar los datos de una orden.
      *
-     * @param  \App\Http\Requests\OrderRequest  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Put(
+     *     path="/api/orders/{id}",
+     *     summary="Actualizar los datos de una orden",
+     *     tags={"Orders"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la orden",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(ref="#/components/schemas/Order")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Orden actualizada exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/Order")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Stock insuficiente",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Stock insuficiente para el producto 123")
+     *         )
+     *     )
+     * )
      */
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
 
         try {
-            // Buscar la orden por ID
             $order = Order::findOrFail($id);
-
-            // Calcular el total_amount para la orden
             $totalAmount = 0;
-
-            // Recuperar los OrderItems actuales de la orden para poder restablecer el stock
             $existingOrderItems = $order->orderItems;
 
-            // Primero, restauramos el stock de los productos que están en la orden
             foreach ($existingOrderItems as $orderItem) {
                 $product = Product::find($orderItem->product_id);
                 if ($product) {
-                    // Reponer el stock del producto según la cantidad original en el OrderItem
                     $product->increment('stock', $orderItem->quantity);
                 }
             }
 
-            // Eliminar los OrderItems actuales
             $order->orderItems()->delete();
 
-            // Iterar por los productos del request para crear los nuevos OrderItems
             foreach ($request->products as $productData) {
-                // Obtener el producto correspondiente
                 $product = Product::find($productData['product_id']);
                 if (!$product || $product->stock < $productData['quantity']) {
                     return response()->json([
@@ -146,10 +220,8 @@ class OrderController extends Controller
                     ], Response::HTTP_BAD_REQUEST);
                 }
 
-                // Calcular el precio total del producto por cantidad
                 $price = $product->price * $productData['quantity'];
 
-                // Crear los nuevos items de la orden
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $productData['product_id'],
@@ -157,14 +229,10 @@ class OrderController extends Controller
                     'price' => $price,
                 ]);
 
-                // Sumar al total_amount
                 $totalAmount += $price;
-
-                // Reducir el stock del producto
                 $product->decrement('stock', $productData['quantity']);
             }
 
-            // Actualizar la orden con el nuevo total_amount y status
             $order->update([
                 'status' => $request->status,
                 'total_amount' => $totalAmount,
@@ -182,38 +250,42 @@ class OrderController extends Controller
     /**
      * Eliminar una orden.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Delete(
+     *     path="/api/orders/{id}",
+     *     summary="Eliminar una orden",
+     *     tags={"Orders"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la orden",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Orden eliminada exitosamente"
+     *     )
+     * )
      */
     public function destroy($id)
     {
         DB::beginTransaction();
 
         try {
-            // Buscar la orden por ID
             $order = Order::findOrFail($id);
-            
-            
-            // Recuperar los items de la orden antes de eliminarla
             $orderItems = $order->orderItems;
-            
-            // Verificar que no se haya cancelado antes para que no aumente el stock
-            if($order->status != 'canceled'){
 
-            // Eliminar los items de la orden
-            foreach ($orderItems as $orderItem) {
-                // Restaurar el stock del producto
-                $product = Product::find($orderItem->product_id);
-                $product->increment('stock', $orderItem->quantity);
-            }
+            if ($order->status != 'canceled') {
+                foreach ($orderItems as $orderItem) {
+                    $product = Product::find($orderItem->product_id);
+                    $product->increment('stock', $orderItem->quantity);
+                }
             }
 
-            // Eliminar los items de la orden
             $order->orderItems()->delete();
-
-            // Eliminar la orden
             $order->delete();
-            
+
             DB::commit();
 
             return response()->json(null, Response::HTTP_NO_CONTENT);
@@ -223,46 +295,75 @@ class OrderController extends Controller
         }
     }
 
+    /**
+     * Obtener el estado de una orden.
+     *
+     * @OA\Get(
+     *     path="/api/orders/{id}/status",
+     *     summary="Obtener el estado de una orden",
+     *     tags={"Orders"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la orden",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Estado de la orden",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", example="pending")
+     *         )
+     *     )
+     * )
+     */
     public function status_order($id)
     {
-        // Obtener la orden por ID
         $order = Order::findOrFail($id);
-
-        // Retornar la orden
         return response()->json($order->status, Response::HTTP_OK);
     }
 
+    /**
+     * Cancelar una orden.
+     *
+     * @OA\Post(
+     *     path="/api/orders/{id}/cancel",
+     *     summary="Cancelar una orden",
+     *     tags={"Orders"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID de la orden",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Orden cancelada exitosamente"
+     *     )
+     * )
+     */
     public function cancel_order($id)
     {
         DB::beginTransaction();
 
         try {
-
-
-            // Buscar la orden por ID
             $order = Order::findOrFail($id);
-            
-            // Verificar que no se haya cancelado antes para que no aumente el stock
-            if($order->status != 'canceled'){
+            if ($order->status != 'canceled') {
+                $orderItems = $order->orderItems;
 
-            // Recuperar los items de la orden antes de eliminarla
-            $orderItems = $order->orderItems;
+                foreach ($orderItems as $orderItem) {
+                    $product = Product::find($orderItem->product_id);
+                    $product->increment('stock', $orderItem->quantity);
+                }
 
-            foreach ($orderItems as $orderItem) {
-                // Restaurar el stock del producto
-                $product = Product::find($orderItem->product_id);
-                $product->increment('stock', $orderItem->quantity);
+                $order->update(['status' => 'canceled']);
             }
 
-            
-
-            // Cancelar la orden
-            $order->update([
-                'status' => 'canceled',
-            ]);
-            }
             DB::commit();
-
             return response()->json(null, Response::HTTP_NO_CONTENT);
         } catch (\Exception $e) {
             DB::rollBack();
