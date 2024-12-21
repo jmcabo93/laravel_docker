@@ -11,7 +11,7 @@ services:
     volumes:
       - ./src:/var/www
     networks:
-      - ${APP_NETWORK}
+      - app-network
     depends_on:
       - db
     expose:
@@ -27,7 +27,7 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./src:/var/www
     networks:
-      - ${APP_NETWORK}
+      - app-network
     depends_on:
       - app
   
@@ -45,11 +45,11 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - ${APP_NETWORK}
+      - app-network
 
 # Definimos la red de la aplicación
 networks:
-  ${APP_NETWORK}:
+  app-network:
     driver: bridge
 
 # Volumen para almacenar los datos de MySQL
