@@ -11,7 +11,7 @@ use OpenApi\Annotations as OA;
  * @OA\Info(
  *     title="API Tienda",
  *     version="1.0.0",
- *     description="Esta es la documentación de la API que permite gestionar categorías, productos y ordenes en una tienda.",
+ *     description="Esta es la documentación de la API que permite gestionar categorías, productos y órdenes en una tienda.",
  *     @OA\Contact(
  *         email="jmcabo93@gmail.com"
  *     )
