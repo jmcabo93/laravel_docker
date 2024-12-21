@@ -6,13 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Http\Requests\CategoryRequest;
 use Illuminate\Http\Response;
+use OpenApi\Annotations as OA;
+
 
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *     path="/api/categories",
+     *     summary="Lista de categorías",
+     *     description="Obtiene una lista paginada de todas las categorías disponibles.",
+     *     security={{"bearerAuth": {}}},
+     *     tags={"Categorías"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de categorías paginada.",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Category")),
+     *             @OA\Property(property="links", type="object", @OA\AdditionalProperties(type="string")),
+     *             @OA\Property(property="meta", type="object", @OA\AdditionalProperties(type="string"))
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Solicitud incorrecta."
+     *     )
+     * )
      */
     public function index()
     {
@@ -21,34 +41,67 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @OA\Post(
+     *     path="/api/categories",
+     *     summary="Crear una nueva categoría",
+     *     description="Crea una nueva categoría proporcionando un nombre y una descripción.",
+     *     security={{"bearerAuth": {}}},
+     *     tags={"Categorías"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(ref="#/components/schemas/CategoryRequest")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Categoría creada correctamente.",
+     *         @OA\JsonContent(ref="#/components/schemas/Category")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Datos incorrectos o incompletos."
+     *     )
+     * )
      */
-     public function store(CategoryRequest $request)
+    public function store(CategoryRequest $request)
     {
         $category = Category::create($request->validated());
         return response()->json($category, Response::HTTP_CREATED);
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *     path="/api/categories/{id}",
+     *     summary="Mostrar una categoría específica",
+     *     description="Obtiene los detalles de una categoría específica mediante su ID.",
+     *     security={{"bearerAuth": {}}},
+     *     tags={"Categorías"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la categoría",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categoría encontrada.",
+     *         @OA\JsonContent(ref="#/components/schemas/Category")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Categoría no encontrada."
+     *     )
+     * )
      */
     public function show($id)
     {
         try {
-
-            // Buscar el producto por ID, lanzará excepción si no lo encuentra
             $category = Category::findOrFail($id);
-                        
-            // Devolver los detalles del producto en formato JSON
             return response()->json($category, Response::HTTP_OK);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // Si no se encuentra el producto, devolver error 404 en formato JSON
             return response()->json([
                 'message' => 'Categoría no encontrada.',
                 'error' => 'Categoría no existe en la base de datos.'
@@ -57,46 +110,96 @@ class CategoryController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Put(
+     *     path="/api/categories/{id}",
+     *     summary="Actualizar una categoría existente",
+     *     description="Actualiza los datos de una categoría existente mediante su ID.",
+     *     security={{"bearerAuth": {}}},
+     *     tags={"Categorías"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la categoría",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(ref="#/components/schemas/CategoryRequest")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categoría actualizada correctamente.",
+     *         @OA\JsonContent(ref="#/components/schemas/Category")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Datos incorrectos o incompletos."
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Categoría no encontrada."
+     *     )
+     * )
      */
     public function update(CategoryRequest $request, $id)
     {
-        // Obtener la categoría
         $category = Category::findOrFail($id);
         $category->update($request->validated());
         return response()->json($category, Response::HTTP_OK);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Delete(
+     *     path="/api/categories/{id}",
+     *     summary="Eliminar una categoría",
+     *     description="Elimina una categoría específica mediante su ID. Si tiene productos asociados, no se puede eliminar.",
+     *     security={{"bearerAuth": {}}},
+     *     tags={"Categorías"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID de la categoría",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Categoría eliminada correctamente."
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Categoría no se puede eliminar debido a productos asociados."
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Categoría no encontrada."
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Error en el servidor."
+     *     )
+     * )
      */
     public function destroy($id)
     {
         try {
-        // Obtener la categoría
-        $category = Category::findOrFail($id);
+            $category = Category::findOrFail($id);
 
-        // Verificar si la categoría tiene productos relacionados
-        if ($category->products()->count() > 0) {
-            return response()->json([
-                'message' => 'No se puede eliminar la categoría porque tiene productos asociados.',
-                'error_code' => 'CATEGORY_HAS_PRODUCTS'
-            ], 400); // Bad Request
+            if ($category->products()->count() > 0) {
+                return response()->json([
+                    'message' => 'No se puede eliminar la categoría porque tiene productos asociados.',
+                    'error_code' => 'CATEGORY_HAS_PRODUCTS'
+                ], 400);
+            }
+
+            $category->delete();
+            return response()->json(['message' => 'Categoría eliminada correctamente.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al eliminar la categoría: ' . $e->getMessage()], 500);
         }
-
-          // Si no hay productos asociados, proceder con la eliminación
-          $category->delete();
-
-          return response()->json(['message' => 'Categoría eliminada correctamente.'], 200);
-       } catch (\Exception $e) {
-        return response()->json(['message' => 'Error al eliminar la categoría: ' . $e->getMessage()], 500);
-       }
     }
 }

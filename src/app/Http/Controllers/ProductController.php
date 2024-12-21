@@ -8,12 +8,13 @@ use Illuminate\Http\Response;
 use OpenApi\Annotations as OA;
 
 /**
- * @OA\SecurityScheme(
- *     securityScheme="bearerAuth",
- *     type="http",
- *     scheme="bearer",
- *     bearerFormat="JWT",
- *     description="Usa un token JWT en formato Bearer para autenticarte"
+ * @OA\Info(
+ *     title="API Tienda",
+ *     version="1.0.0",
+ *     description="Esta es la documentación de la API que permite gestionar categorías, productos y ordenes en una tienda.",
+ *     @OA\Contact(
+ *         email="jmcabo93@gmail.com"
+ *     )
  * )
  */
 
@@ -22,7 +23,7 @@ class ProductController extends Controller
     /**
      * @OA\Get(
      *     path="/api/products",
-     *     tags={"Products"},
+     *     tags={"Productos"},
      *     summary="Obtiene una lista de productos",
      *     description="Devuelve una lista de productos paginados.",
      *     security={{"bearerAuth": {}}},
@@ -49,7 +50,7 @@ class ProductController extends Controller
     /**
      * @OA\Post(
      *     path="/api/products",
-     *     tags={"Products"},
+     *     tags={"Productos"},
      *     summary="Crea un nuevo producto",
      *     description="Almacena un nuevo producto en la base de datos.",
      *     security={{"bearerAuth": {}}},     
@@ -85,7 +86,7 @@ class ProductController extends Controller
     /**
      * @OA\Get(
      *     path="/api/products/{id}",
-     *     tags={"Products"},
+     *     tags={"Productos"},
      *     summary="Obtiene un producto específico",
      *     description="Devuelve los detalles de un producto por su ID.",
      *     security={{"bearerAuth": {}}},
@@ -123,7 +124,7 @@ class ProductController extends Controller
     /**
      * @OA\Put(
      *     path="/api/products/{id}",
-     *     tags={"Products"},
+     *     tags={"Productos"},
      *     summary="Actualiza un producto existente",
      *     description="Actualiza los datos de un producto por su ID.",
      *     security={{"bearerAuth": {}}},
@@ -167,7 +168,7 @@ class ProductController extends Controller
     /**
      * @OA\Delete(
      *     path="/api/products/{id}",
-     *     tags={"Products"},
+     *     tags={"Productos"},
      *     summary="Elimina un producto",
      *     description="Elimina un producto de la base de datos por su ID.",
      *     security={{"bearerAuth": {}}},
@@ -198,7 +199,7 @@ class ProductController extends Controller
     /**
      * @OA\Get(
      *     path="/api/products/random",
-     *     tags={"Products"},
+     *     tags={"Productos"},
      *     summary="Obtiene un producto aleatorio",
      *     description="Devuelve un producto aleatorio de la base de datos.",
      *     security={{"bearerAuth": {}}},

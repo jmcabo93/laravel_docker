@@ -13,7 +13,7 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/login",
-     *     tags={"Authentication"},
+     *     tags={"Autenticación"},
      *     summary="Login",
      *     description="Autenticación de usuario con email y password. Retorna un token Bearer para usar en solicitudes posteriores.",
      *     operationId="login",
@@ -93,7 +93,7 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/logout",
-     *     tags={"Authentication"},
+     *     tags={"Autenticación"},
      *     summary="Logout",
      *     description="Cierra sesión y revoca todos los tokens de acceso del usuario autenticado.",
      *     operationId="logout",
