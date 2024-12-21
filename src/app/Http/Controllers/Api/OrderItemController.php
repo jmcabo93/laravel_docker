@@ -116,6 +116,9 @@ class OrderItemController extends Controller
             // Reducir el stock del producto
             $product->decrement('stock', $request->quantity);
 
+            // Actualizar el total de la orden
+            $this->updateOrderTotal($request->order_id);
+
             DB::commit();
 
             return response()->json($orderItem, Response::HTTP_CREATED);
@@ -203,6 +206,9 @@ class OrderItemController extends Controller
             // Reducir el stock del producto con la nueva cantidad
             $product->decrement('stock', $request->quantity);
 
+            // Actualizar el total de la orden
+            $this->updateOrderTotal($request->order_id);
+
             DB::commit();
 
             return response()->json($orderItem, Response::HTTP_OK);
@@ -256,12 +262,29 @@ class OrderItemController extends Controller
             // Eliminar el item de la orden
             $orderItem->delete();
 
+            // Actualizar el total de la orden
+            $this->updateOrderTotal($orderItem->order_id);
+
             DB::commit();
 
             return response()->json(null, Response::HTTP_NO_CONTENT);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al eliminar el item de la orden: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Método para actualizar el total de la orden
+     */
+    private function updateOrderTotal($orderId)
+    {
+        $order = Order::find($orderId);
+
+        if ($order) {
+            $totalAmount = $order->orderItems->sum('price'); // Suma los precios de todos los items de la orden
+            $order->total_amount = $totalAmount; // Actualiza el campo total_amount
+            $order->save();
         }
     }
 }

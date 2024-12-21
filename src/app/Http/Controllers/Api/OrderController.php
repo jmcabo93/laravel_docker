@@ -73,14 +73,16 @@ class OrderController extends Controller
      *     )
      * )
      */
-    public function store(Request $request)
+
+     public function store(OrderRequest $request)
     {
         DB::beginTransaction();
 
         try {
+            
             // Crear la orden
             $order = Order::create([
-                'user_id' => $request->user_id,
+                'user_id' => $request->user_id ?? auth()->id(),// Usuario autenticado o user_id
                 'status' => 'pending',
                 'total_amount' => 0,
             ]);
@@ -92,7 +94,7 @@ class OrderController extends Controller
             foreach ($request->products as $productData) {
                 // Verificar el stock disponible del producto
                 $product = Product::find($productData['product_id']);
-                if (!$product || $product->stock < $productData['quantity']) {
+                if ($product->stock < $productData['quantity']) {
                     return response()->json([
                         'message' => 'Stock insuficiente para el producto ' . $productData['product_id'],
                     ], Response::HTTP_BAD_REQUEST);
@@ -194,7 +196,9 @@ class OrderController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, $id)
+
+    
+    public function update(OrderRequest $request, $id)
     {
         DB::beginTransaction();
 
