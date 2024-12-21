@@ -6,12 +6,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: laravel-app
+    container_name: ${APP_CONTAINER_NAME}
     working_dir: /var/www
     volumes:
       - ./src:/var/www
     networks:
-      - app-network
+      - ${APP_NETWORK}
     depends_on:
       - db
     expose:
@@ -20,36 +20,36 @@ services:
   # Servicio para Nginx
   nginx:
     image: nginx:latest
-    container_name: nginx-server
+    container_name: ${NGINX_CONTAINER_NAME}
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./src:/var/www
     networks:
-      - app-network
+      - ${APP_NETWORK}
     depends_on:
       - app
   
   # Servicio para MySQL
   db:
     image: mysql:5.7
-    container_name: mysql-db
+    container_name: ${DB_CONTAINER_NAME}
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3306:3306"
+      - "${DB_PORT}:3306"
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - app-network
+      - ${APP_NETWORK}
 
 # Definimos la red de la aplicación
 networks:
-  app-network:
+  ${APP_NETWORK}:
     driver: bridge
 
 # Volumen para almacenar los datos de MySQL
