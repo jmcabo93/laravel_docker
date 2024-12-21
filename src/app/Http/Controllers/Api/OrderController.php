@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use App\Http\Requests\OrderRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
@@ -267,8 +268,9 @@ class OrderController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
-     *         response=204,
-     *         description="Orden eliminada exitosamente"
+     *         response=200,
+     *         description="Orden eliminada exitosamente",
+               @OA\JsonContent(ref="#/components/schemas/Order")
      *     )
      * )
      */
@@ -292,7 +294,7 @@ class OrderController extends Controller
 
             DB::commit();
 
-            return response()->json(null, Response::HTTP_NO_CONTENT);
+            return response()->json(null, Response::HTTP_OK);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al eliminar la orden: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -332,7 +334,7 @@ class OrderController extends Controller
     /**
      * Cancelar una orden.
      *
-     * @OA\Post(
+     * @OA\Get(
      *     path="/api/orders/{id}/cancel",
      *     summary="Cancelar una orden",
      *     tags={"Orders"},
@@ -345,8 +347,9 @@ class OrderController extends Controller
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
-     *         response=204,
-     *         description="Orden cancelada exitosamente"
+     *         response=200,
+     *         description="Orden cancelada exitosamente",
+     *          @OA\JsonContent(ref="#/components/schemas/Order")
      *     )
      * )
      */
@@ -368,7 +371,7 @@ class OrderController extends Controller
             }
 
             DB::commit();
-            return response()->json(null, Response::HTTP_NO_CONTENT);
+            return response()->json($order, Response::HTTP_OK);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Error al cancelar la orden: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\OrderItem;
+use App\Models\Order;
 use App\Models\Product;
 use App\Http\Requests\OrderItemRequest;
 use Illuminate\Http\Response;
@@ -59,7 +60,7 @@ class OrderItemController extends Controller
      *     tags={"OrderItem"},
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/OrderItem")
+     *         @OA\JsonContent(ref="#/components/schemas/OrderItemPost")
      *     ),
      *     @OA\Response(
      *         response=201,
@@ -128,6 +129,59 @@ class OrderItemController extends Controller
         }
     }
 
+       /**
+    * @OA\Get(
+    *     path="/api/order-items/{id}",
+    *     summary="Obtener un item específico de una orden",
+    *     description="Obtiene los detalles de un item de la orden, incluyendo la relación con el producto",
+    *     security={{"bearerAuth": {}}},
+    *     tags={"OrderItem"},
+    *     @OA\Parameter(
+    *         name="id",
+    *         in="path",
+    *         required=true,
+    *         description="ID del item de la orden",
+    *         @OA\Schema(type="integer")
+    *     ),
+    *     @OA\Response(
+    *         response=200,
+    *         description="Detalles del item de la orden",
+    *         @OA\JsonContent(ref="#/components/schemas/OrderItem")
+    *     ),
+    *     @OA\Response(
+    *         response=404,
+    *         description="Item de la orden no encontrado",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="message", type="string", example="Item de la orden no encontrado")
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=500,
+    *         description="Error al obtener el item de la orden",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="message", type="string", example="Error al obtener el item de la orden")
+    *         )
+    *     )
+    * )
+    */
+
+    public function show($id)
+    {
+        try {
+            // Buscar el item de la orden por su ID
+            $orderItem = OrderItem::with('product')->find($id);
+    
+            if (!$orderItem) {
+                return response()->json(['message' => 'Item de la orden no encontrado'], Response::HTTP_NOT_FOUND)    ;
+            }
+    
+            return response()->json($orderItem, Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al obtener el item de la orden: ' . $e->getMessage()],     Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     /**
      * @OA\Put(
      *     path="/api/order-items/{id}",
@@ -144,7 +198,7 @@ class OrderItemController extends Controller
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/OrderItem")
+     *         @OA\JsonContent(ref="#/components/schemas/OrderItemPost")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -174,6 +228,8 @@ class OrderItemController extends Controller
      *     )
      * )
      */
+
+
     public function update(OrderItemRequest $request, $id)
     {
         DB::beginTransaction();
@@ -279,8 +335,10 @@ class OrderItemController extends Controller
      */
     private function updateOrderTotal($orderId)
     {
-        $order = Order::find($orderId);
-
+        $order = Order::findOrFail($orderId);
+        if (!$order) {
+                return response()->json(['message' => 'Orden no encontrado'], Response::HTTP_NOT_FOUND)    ;
+            }
         if ($order) {
             $totalAmount = $order->orderItems->sum('price'); // Suma los precios de todos los items de la orden
             $order->total_amount = $totalAmount; // Actualiza el campo total_amount

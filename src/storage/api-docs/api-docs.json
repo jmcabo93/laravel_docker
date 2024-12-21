@@ -561,8 +561,15 @@
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Orden eliminada exitosamente"
+                    "200": {
+                        "description": "Orden eliminada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Order"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -617,13 +624,13 @@
             }
         },
         "/api/orders/{id}/cancel": {
-            "post": {
+            "get": {
                 "tags": [
                     "Orders"
                 ],
                 "summary": "Cancelar una orden",
                 "description": "Cancelar una orden.",
-                "operationId": "c60d7c56c93ca4745034e4fd5efcf4ce",
+                "operationId": "ceb5838d181dd8cc1ce548978cb3c1d2",
                 "parameters": [
                     {
                         "name": "id",
@@ -636,8 +643,15 @@
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Orden cancelada exitosamente"
+                    "200": {
+                        "description": "Orden cancelada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Order"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -720,7 +734,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/OrderItem"
+                                "$ref": "#/components/schemas/OrderItemPost"
                             }
                         }
                     }
@@ -793,6 +807,74 @@
             }
         },
         "/api/order-items/{id}": {
+            "get": {
+                "tags": [
+                    "OrderItem"
+                ],
+                "summary": "Obtener un item específico de una orden",
+                "description": "Obtiene los detalles de un item de la orden, incluyendo la relación con el producto",
+                "operationId": "2d064991b5a9733f6022f1ee79583b5a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del item de la orden",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles del item de la orden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrderItem"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item de la orden no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Item de la orden no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error al obtener el item de la orden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error al obtener el item de la orden"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "put": {
                 "tags": [
                     "OrderItem"
@@ -816,7 +898,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/OrderItem"
+                                "$ref": "#/components/schemas/OrderItemPost"
                             }
                         }
                     }
@@ -1165,10 +1247,6 @@
                     "description"
                 ],
                 "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
                     "name": {
                         "type": "string",
                         "example": "Electronics"
@@ -1190,6 +1268,11 @@
                         "description": "ID del usuario",
                         "type": "integer",
                         "example": 1
+                    },
+                    "status": {
+                        "description": "Estado de la orden",
+                        "type": "string",
+                        "example": "pending"
                     },
                     "products": {
                         "type": "array",
@@ -1224,11 +1307,6 @@
                     "price"
                 ],
                 "properties": {
-                    "id": {
-                        "description": "ID del item de la orden",
-                        "type": "integer",
-                        "example": 1
-                    },
                     "order_id": {
                         "description": "ID de la orden",
                         "type": "integer",
@@ -1256,6 +1334,32 @@
                 },
                 "type": "object"
             },
+            "OrderItemPost": {
+                "required": [
+                    "order_id",
+                    "product_id",
+                    "quantity",
+                    "price"
+                ],
+                "properties": {
+                    "order_id": {
+                        "description": "ID de la orden",
+                        "type": "integer",
+                        "example": 101
+                    },
+                    "product_id": {
+                        "description": "ID del producto",
+                        "type": "integer",
+                        "example": 202
+                    },
+                    "quantity": {
+                        "description": "Cantidad de productos",
+                        "type": "integer",
+                        "example": 2
+                    }
+                },
+                "type": "object"
+            },
             "Product": {
                 "required": [
                     "name",
@@ -1265,11 +1369,6 @@
                     "category_id"
                 ],
                 "properties": {
-                    "id": {
-                        "description": "ID del producto",
-                        "type": "integer",
-                        "example": 1
-                    },
                     "name": {
                         "description": "Nombre del producto",
                         "type": "string",

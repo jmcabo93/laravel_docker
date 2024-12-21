@@ -9,7 +9,6 @@ use OpenApi\Annotations as OA;
  *     schema="Product",
  *     type="object",
  *     required={"name","description", "price", "stock", "category_id"},
- *     @OA\Property(property="id", type="integer", description="ID del producto",example=1),
  *     @OA\Property(property="name", type="string", description="Nombre del producto", example="Smartphone"),
  *     @OA\Property(property="description", type="string", description="Descripción del producto", example="Electronics"),
  *     @OA\Property(property="price", type="number", format="float", description="Precio del producto", example=100),

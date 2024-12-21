@@ -40,8 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('logout', [AuthController::class, 'logout']);
 
-    Route::get('cancel_order/{id}', [OrderController::class, 'cancel_order']);
-    Route::get('status_order/{id}', [OrderController::class, 'status_order']);
+    Route::get('orders/{id}/cancel', [OrderController::class, 'cancel_order']);
+    Route::get('orders/{id}/status', [OrderController::class, 'status_order']);
     Route::get('random_product', [ProductController::class, 'random_product']);
 
 });

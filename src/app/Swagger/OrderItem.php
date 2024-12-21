@@ -9,7 +9,6 @@ use OpenApi\Annotations as OA;
  *     schema="OrderItem",
  *     type="object",
  *     required={"order_id", "product_id", "quantity", "price"},
- *     @OA\Property(property="id",type="integer",description="ID del item de la orden",example=1),
  *     @OA\Property(property="order_id",type="integer",description="ID de la orden",example=101),
  *     @OA\Property(property="product_id",type="integer",description="ID del producto",example=202),
  *     @OA\Property(property="quantity",type="integer",description="Cantidad de productos",example=2),
@@ -19,6 +18,22 @@ use OpenApi\Annotations as OA;
  */
 
 class OrderItem
+{
+   
+}
+
+/**
+ * @OA\Schema(
+ *     schema="OrderItemPost",
+ *     type="object",
+ *     required={"order_id", "product_id", "quantity", "price"},
+ *     @OA\Property(property="order_id",type="integer",description="ID de la orden",example=101),
+ *     @OA\Property(property="product_id",type="integer",description="ID del producto",example=202),
+ *     @OA\Property(property="quantity",type="integer",description="Cantidad de productos",example=2),
+ * )
+ */
+
+class OrderItemPost
 {
    
 }
