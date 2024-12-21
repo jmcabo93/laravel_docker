@@ -5,13 +5,40 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Http\Response;
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT",
+ *     description="Usa un token JWT en formato Bearer para autenticarte"
+ * )
+ */
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *     path="/api/products",
+     *     tags={"Products"},
+     *     summary="Obtiene una lista de productos",
+     *     description="Devuelve una lista de productos paginados.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de productos",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Product")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No se encontraron productos"
+     *     )
+     * )
      */
     public function index()
     {
@@ -20,10 +47,34 @@ class ProductController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @OA\Post(
+     *     path="/api/products",
+     *     tags={"Products"},
+     *     summary="Crea un nuevo producto",
+     *     description="Almacena un nuevo producto en la base de datos.",
+     *     security={{"bearerAuth": {}}},     
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "price", "stock", "category_id"},
+     *             @OA\Property(property="name", type="string", example="Producto 1"),
+     *             @OA\Property(property="description", type="string", example="Descripción del producto"),
+     *             @OA\Property(property="price", type="number", format="float", example="99.99"),
+     *             @OA\Property(property="stock", type="integer", example=100),
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="image", type="string", format="binary", example="image.jpg")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Producto creado exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Solicitud incorrecta"
+     *     )
+     * )
      */
     public function store(ProductRequest $request)
     {
@@ -32,21 +83,36 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *     path="/api/products/{id}",
+     *     tags={"Products"},
+     *     summary="Obtiene un producto específico",
+     *     description="Devuelve los detalles de un producto por su ID.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del producto",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Producto encontrado",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado"
+     *     )
+     * )
      */
     public function show($id)
     {
         try {
-            // Buscar el producto por ID, lanzará excepción si no lo encuentra
             $product = Product::findOrFail($id);
-            
-            // Devolver los detalles del producto en formato JSON
             return response()->json($product, Response::HTTP_OK);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // Si no se encuentra el producto, devolver error 404 en formato JSON
             return response()->json([
                 'message' => 'Producto no encontrado.',
                 'error' => 'Producto no existe en la base de datos.'
@@ -55,11 +121,41 @@ class ProductController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Put(
+     *     path="/api/products/{id}",
+     *     tags={"Products"},
+     *     summary="Actualiza un producto existente",
+     *     description="Actualiza los datos de un producto por su ID.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del producto",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name", "price", "stock", "category_id"},
+     *             @OA\Property(property="name", type="string", example="Producto 1"),
+     *             @OA\Property(property="description", type="string", example="Descripción actualizada del producto"),
+     *             @OA\Property(property="price", type="number", format="float", example="99.99"),
+     *             @OA\Property(property="stock", type="integer", example=100),
+     *             @OA\Property(property="category_id", type="integer", example=1),
+     *             @OA\Property(property="image", type="string", format="binary", example="image.jpg")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Producto actualizado exitosamente",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado"
+     *     )
+     * )
      */
     public function update(ProductRequest $request, $id)
     {
@@ -69,10 +165,28 @@ class ProductController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @OA\Delete(
+     *     path="/api/products/{id}",
+     *     tags={"Products"},
+     *     summary="Elimina un producto",
+     *     description="Elimina un producto de la base de datos por su ID.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID del producto",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Producto eliminado"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Producto no encontrado"
+     *     )
+     * )
      */
     public function destroy($id)
     {
@@ -82,22 +196,30 @@ class ProductController extends Controller
     }
 
     /**
-     * Display a random product.
-     *
-     * @return \Illuminate\Http\Response
+     * @OA\Get(
+     *     path="/api/products/random",
+     *     tags={"Products"},
+     *     summary="Obtiene un producto aleatorio",
+     *     description="Devuelve un producto aleatorio de la base de datos.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Producto aleatorio",
+     *         @OA\JsonContent(ref="#/components/schemas/Product")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="No hay productos disponibles"
+     *     )
+     * )
      */
     public function random_product()
     {
-         try {
-            // Obtener un producto aleatorio
+        try {
             $product = Product::inRandomOrder()->first();
-
-            // Verificar si existe el producto
             if (!$product) {
                 return response()->json(['message' => 'No hay productos disponibles.'], Response::HTTP_NOT_FOUND);
             }
-
-            // Retornar el producto
             return response()->json($product, Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error al obtener el producto aleatorio: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
