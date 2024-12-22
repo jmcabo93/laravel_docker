@@ -48,15 +48,30 @@ MYSQL_USER=admin
 MYSQL_PASSWORD=123456
 ```
 
-### 3. Construir e iniciar los contenedores, también instala las dependencias de Laravel
+### 3. Construir e iniciar los contenedores
 
 Ejecuta el comando 
 
 ```bash
 docker-compose up --build
 ```
-
 ![JWT](images/servicios.png)
+
+### 4. Instalar dependencias de laravel y configuración de archivo .env
+
+Ejecuta el comando 
+
+```bash
+docker exec -it laravel-app bash
+```
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+Configura el .env  de Laravel como se explicó en el segundo punto. 
+
 
 ### 4. Acceder a la aplicación
 

@@ -20,9 +20,6 @@ WORKDIR /var/www
 # Copiamos el proyecto Laravel en el contenedor
 COPY src/ /var/www
 
-# Instalamos las dependencias de Laravel
-RUN composer install
-
 # Cambiamos los permisos de los directorios de almacenamiento
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
