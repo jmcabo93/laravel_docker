@@ -31,7 +31,7 @@ DB_CONTAINER_NAME=mysql-db
 NGINX_PORT=80
 DB_PORT=3306
 
-# Configuración de la base de datos, la cual debe coincidir con la del archivo .env de Laravel
+# La configuración de la base de datos en docker-compos.yml debe coincidir con la del archivo .env de Laravel
 MYSQL_ROOT_PASSWORD=root
 MYSQL_DATABASE=laravel
 MYSQL_USER=admin
@@ -49,7 +49,7 @@ cd project-root
 
 ### 2. Construir e iniciar los contenedores
 
-Ejecuta el comando
+Ejecuta el comando 
 
 ```bash
 docker-compose up --build
@@ -67,11 +67,11 @@ Se utilizó **Laravel Breeze** para generar todo lo relacionado con el proceso d
 
 ### 5. Ejecutar comandos de Laravel
 
-Para crear la base datos ejecuta:
+Para crear la base de datos ejecuta:
 ```bash
 docker exec -it laravel-app php artisan migrate
 ```
-Para poblar la base datos con categorías y productos ejecuta:
+Para poblar la base de datos con categorías y productos ejecuta:
 ```bash
 docker exec -it laravel-app php artisan db:seed
 ```
