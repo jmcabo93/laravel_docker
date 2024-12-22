@@ -11,6 +11,7 @@ Tener instalados:
 
 ```
 project-root/
+├── images/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── src/            # Código de la aplicación Laravel
@@ -85,9 +86,14 @@ docker exec -it laravel-app php artisan cargar:productos
 ### 7. Seguridad
 
 La API ha sido desarrollada utilizando **Laravel Sanctum** para la creación de tokens de autenticación. Todas las rutas están protegidas mediante **JWT (JSON Web Token)**, y es necesario incluir la directiva `Bearer <token>` en el encabezado de las solicitudes para acceder a los endpoints protegidos.
+Se debe haber registrado previamente en el sistema para después autenticarse en la API y obtener el token que le dará acceso.
+Puede registrarse en 
+```
+http://localhost/register
+```
 
-![JWT](images/2.png)
-![JWT](images/1.jpg)
+![JWT](images/login.png)
+![JWT](images/bearer.png)
 
 ### 8. Documentación de la API usando Swagger
 
