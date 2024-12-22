@@ -73,7 +73,7 @@ chmod -R 755 /var/www
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 ```
 Configura el .env  de Laravel como se explicó en el segundo punto y muy importante que el **DB_HOST** sea igual a como se definió el servicio para base de datos en el docker-compose.yml, en este caso sería **db**
- 
+
 ![JWT](images/db.png)
 
 ### 5. Acceder a la aplicación
@@ -90,15 +90,15 @@ Se utilizó **Laravel Breeze** para generar todo lo relacionado con el proceso d
 
 Para crear la base de datos ejecuta:
 ```bash
-docker exec -it laravel-app php artisan migrate
+php artisan migrate
 ```
 Para insertar en la base de datos categorías y productos ejecuta:
 ```bash
-docker exec -it laravel-app php artisan db:seed
+php artisan db:seed
 ```
 Para adicionar productos desde una API externa (https://fakestoreapi.com/products) ejecuta:
 ```bash
-docker exec -it laravel-app php artisan cargar:productos
+php artisan cargar:productos
 ```
 
 ### 8. Seguridad
