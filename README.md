@@ -72,8 +72,9 @@ php artisan key:generate
 chmod -R 755 /var/www
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 ```
-Configura el .env  de Laravel como se explicó en el segundo punto. 
-
+Configura el .env  de Laravel como se explicó en el segundo punto y muy importante que el **DB_HOST** sea igual a como se definió el servicio para base de datos en el docker-compose.yml, en este caso sería **db**
+ 
+![JWT](images/db.png)
 
 ### 5. Acceder a la aplicación
 
