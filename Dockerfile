@@ -20,9 +20,6 @@ WORKDIR /var/www
 # Copiamos el proyecto Laravel en el contenedor
 COPY src/ /var/www
 
-# Cambiamos los permisos de los directorios de almacenamiento
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-
 # Exponemos el puerto 9000
 EXPOSE 9000
 

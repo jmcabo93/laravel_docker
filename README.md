@@ -53,7 +53,7 @@ MYSQL_PASSWORD=123456
 Ejecuta el comando 
 
 ```bash
-docker-compose up --build
+docker-compose up -d --build
 ```
 ![JWT](images/servicios.png)
 
@@ -69,21 +69,23 @@ docker exec -it laravel-app bash
 composer install
 cp .env.example .env
 php artisan key:generate
+chmod -R 755 /var/www
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 ```
 Configura el .env  de Laravel como se explicó en el segundo punto. 
 
 
-### 4. Acceder a la aplicación
+### 5. Acceder a la aplicación
 
 ```
 http://localhost
 ```
 
-### 5. Laravel Breeze
+### 6. Laravel Breeze
 
 Se utilizó **Laravel Breeze** para generar todo lo relacionado con el proceso de inicio de sesión y registro de usuarios.
 
-### 6. Ejecutar comandos de Laravel
+### 7. Ejecutar comandos de Laravel
 
 Para crear la base de datos ejecuta:
 ```bash
@@ -98,7 +100,7 @@ Para adicionar productos desde una API externa (https://fakestoreapi.com/product
 docker exec -it laravel-app php artisan cargar:productos
 ```
 
-### 7. Seguridad
+### 8. Seguridad
 
 La API ha sido desarrollada utilizando **Laravel Sanctum** para la creación de tokens de autenticación. Todas las rutas están protegidas mediante **JWT (JSON Web Token)**, y es necesario incluir la directiva `Bearer <token>` en el encabezado de las solicitudes para acceder a los endpoints protegidos.
 Se debe haber registrado previamente en el sistema para después autenticarse en la API y obtener el token que le dará acceso.
@@ -110,7 +112,7 @@ http://localhost/register
 ![JWT](images/login.png)
 ![JWT](images/bearer.png)
 
-### 8. Documentación de la API usando Swagger
+### 9. Documentación de la API usando Swagger
 
 Puedes visualizar todos los endpoints disponibles y comprobar su funcionamiento en la url:
 
@@ -121,10 +123,15 @@ http://localhost/api/documentation
 
 
 
-### 8. Detener los contenedores
+### 10. Detener los contenedores
 
 Para detener los contenedores en ejecución, usa:
 
 ```bash
 docker-compose down
+```
+Si los quieres levantar solamente sin reconstruirlos: 
+
+```bash
+docker-compose up -d
 ```
