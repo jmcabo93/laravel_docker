@@ -125,7 +125,7 @@ http://localhost/api/documentation
 ![JWT](images/todas.png)
 
 
-### 9. Redis
+### 10. Redis
 
 Se utilizó Redis para gestionar el almacenamiento en caché de los **productos**, muestro un fragmento del código.
 Solo habilitado como ejemplo para este modelo:
