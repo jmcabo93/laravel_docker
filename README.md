@@ -36,6 +36,7 @@ cd laravel_docker
 APP_CONTAINER_NAME=laravel-app
 NGINX_CONTAINER_NAME=nginx-server
 DB_CONTAINER_NAME=mysql-db
+REDIS_CONTAINER_NAME=redis-server
 
 # Puertos
 NGINX_PORT=80
@@ -59,11 +60,13 @@ docker-compose up -d --build
 
 ### 4. Instalar dependencias de laravel y configuración de archivo .env
 
-Ejecuta el comando 
+Ejecuta el comando siguiente para acceder al directorio de la aplicación en el contenedor:
 
 ```bash
 docker exec -it laravel-app bash
 ```
+
+Luego puedes ejecutar de una vez los sigueintes comandos, los cuales instalarán las dependencias, crearán el archivo .env, se generará la llave de la app y por último se asignarán los permisos adecuados para el servidor.
 
 ```bash
 composer install
@@ -87,7 +90,7 @@ Se utilizó **Laravel Breeze** para generar todo lo relacionado con el proceso d
 
 ### 7. Ejecutar comandos de Laravel
 
-Para crear la base de datos ejecuta:
+Para generar la estructura de la base de datos ejecuta:
 ```bash
 php artisan migrate
 ```
@@ -122,15 +125,37 @@ http://localhost/api/documentation
 ![JWT](images/todas.png)
 
 
+### 9. Redis
 
-### 10. Detener los contenedores
+Se utilizó Redis para gestionar el almacenamiento en caché de los **productos**, muestro un fragmento del código.
+Solo habilitado como ejemplo para este modelo:
 
-Para detener los contenedores en ejecución, usa:
+```
+    public function index()
+    {
+        // Obtenemos la página solicitada
+        $page = request()->input('page', 1);
+
+        // Listar los productos desde la caché en la página solicitada, si no los encuentra guardarlos por 1 hora para una pŕoxima consulta.
+        // Se utilizan tags para cuando se inserte, actualice o elimine un producto, limpiar solo ese tag sin afectar los datos almacenados en caché de otros modelos.
+
+        $products = Cache::tags(['products'])->remember("products_page_{$page}", 3600, function () use ($page) {
+            return Product::paginate(10, ['*'], 'page', $page); // 10 productos por página
+        });
+
+        return response()->json($products, Response::HTTP_OK);
+    }
+```
+
+
+### 11. Gestionar los contenedores
+
+Para detener los contenedores usa:
 
 ```bash
 docker-compose down
 ```
-Si los quieres levantar solamente sin reconstruirlos: 
+Si los quieres iniciar sin reconstruirlos: 
 
 ```bash
 docker-compose up -d

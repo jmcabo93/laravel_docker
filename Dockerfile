@@ -10,6 +10,11 @@ RUN apt-get update && apt-get install -y \
     git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql
+    
+# Instalamos la extensión de Redis para PHP (si quieres usar la extensión nativa php-redis)
+RUN apt-get install -y libssl-dev \
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
 # Instalamos Composer (gestor de dependencias de PHP)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
