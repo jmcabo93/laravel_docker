@@ -10,70 +10,15 @@ use App\Http\Requests\OrderRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
-/**
- * @OA\Tag(
- *     name="Orders",
- *     description="Operaciones sobre las órdenes"
- * )
- */
+
 class OrderController extends Controller
 {
-    /**
-     * Obtener la lista de todas las órdenes (paginadas).
-     *
-     * @OA\Get(
-     *     path="/api/orders",
-     *     summary="Obtener la lista de todas las órdenes",
-     *     tags={"Orders"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Lista de órdenes paginada",
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="current_page", type="integer", example=1),
-     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Order")),
-     *             @OA\Property(property="total", type="integer", example=100),
-     *             @OA\Property(property="per_page", type="integer", example=10)
-     *         )
-     *     )
-     * )
-     */
+     
     public function index()
     {
         $orders = Order::with('orderItems.product')->paginate(10);
         return response()->json($orders, Response::HTTP_OK);
     }
-
-    /**
-     * Almacenar una nueva orden.
-     *
-     * @OA\Post(
-     *     path="/api/orders",
-     *     summary="Almacenar una nueva orden",
-     *     tags={"Orders"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(ref="#/components/schemas/Order")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Orden creada exitosamente",
-     *         @OA\JsonContent(ref="#/components/schemas/Order")
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Stock insuficiente",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Stock insuficiente para el producto 123")
-     *         )
-     *     )
-     * )
-     */
 
      public function store(OrderRequest $request)
     {
@@ -133,26 +78,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Mostrar los detalles de una orden específica.
-     *
-     * @OA\Get(
-     *     path="/api/orders/{id}",
-     *     summary="Mostrar los detalles de una orden específica",
-     *     tags={"Orders"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID de la orden",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Detalle de la orden",
-     *         @OA\JsonContent(ref="#/components/schemas/Order")
-     *     )
-     * )
+
      */
     public function show($id)
     {
@@ -160,43 +86,6 @@ class OrderController extends Controller
         $order->load('orderItems.product');
         return response()->json($order, Response::HTTP_OK);
     }
-
-    /**
-     * Actualizar los datos de una orden.
-     *
-     * @OA\Put(
-     *     path="/api/orders/{id}",
-     *     summary="Actualizar los datos de una orden",
-     *     tags={"Orders"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID de la orden",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="application/json",
-     *             @OA\Schema(ref="#/components/schemas/Order")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Orden actualizada exitosamente",
-     *         @OA\JsonContent(ref="#/components/schemas/Order")
-     *     ),
-     *     @OA\Response(
-     *         response=400,
-     *         description="Stock insuficiente",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Stock insuficiente para el producto 123")
-     *         )
-     *     )
-     * )
-     */
 
     
     public function update(OrderRequest $request, $id)
@@ -252,28 +141,7 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Eliminar una orden.
-     *
-     * @OA\Delete(
-     *     path="/api/orders/{id}",
-     *     summary="Eliminar una orden",
-     *     tags={"Orders"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID de la orden",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Orden eliminada exitosamente",
-               @OA\JsonContent(ref="#/components/schemas/Order")
-     *     )
-     * )
-     */
+    
     public function destroy($id)
     {
         DB::beginTransaction();
@@ -302,28 +170,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Obtener el estado de una orden.
-     *
-     * @OA\Get(
-     *     path="/api/orders/{id}/status",
-     *     summary="Obtener el estado de una orden",
-     *     tags={"Orders"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID de la orden",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Estado de la orden",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", example="pending")
-     *         )
-     *     )
-     * )
+
      */
     public function status_order($id)
     {
@@ -331,28 +178,6 @@ class OrderController extends Controller
         return response()->json($order->status, Response::HTTP_OK);
     }
 
-    /**
-     * Cancelar una orden.
-     *
-     * @OA\Get(
-     *     path="/api/orders/{id}/cancel",
-     *     summary="Cancelar una orden",
-     *     tags={"Orders"},
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         description="ID de la orden",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Orden cancelada exitosamente",
-     *          @OA\JsonContent(ref="#/components/schemas/Order")
-     *     )
-     * )
-     */
     public function cancel_order($id)
     {
         DB::beginTransaction();
