@@ -1111,6 +1111,9 @@
                     },
                     "404": {
                         "description": "Producto no encontrado"
+                    },
+                    "400": {
+                        "description": "Producto no encontrado"
                     }
                 },
                 "security": [
@@ -1192,6 +1195,9 @@
                     },
                     "404": {
                         "description": "Producto no encontrado"
+                    },
+                    "400": {
+                        "description": "No se puede eliminar el producto porque está asociado a una o más órdenes."
                     }
                 },
                 "security": [
@@ -1201,14 +1207,14 @@
                 ]
             }
         },
-        "/api/products/random": {
+        "/api/random_product": {
             "get": {
                 "tags": [
                     "Productos"
                 ],
                 "summary": "Obtiene un producto aleatorio",
                 "description": "Devuelve un producto aleatorio de la base de datos.",
-                "operationId": "066d83345970adb776ac04745c7186bc",
+                "operationId": "34535420e6d7574a6e538bc6c0eeaa69",
                 "responses": {
                     "200": {
                         "description": "Producto aleatorio",

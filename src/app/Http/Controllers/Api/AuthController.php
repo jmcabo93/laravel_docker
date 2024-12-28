@@ -26,7 +26,7 @@ class AuthController extends Controller
            ], 401);
         }
 
-        $token = $user->createToken('YourAppName')->plainTextToken;
+        $token = $user->createToken(env('APP_NAME'))->plainTextToken;
 
         return response()->json([
             'message' => 'Autenticado exitosamente.',

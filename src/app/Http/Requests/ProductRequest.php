@@ -26,7 +26,7 @@ class ProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
@@ -46,6 +46,7 @@ class ProductRequest extends FormRequest
             'name.string' => 'El nombre del producto debe ser una cadena de texto.',
             'name.max' => 'El nombre del producto no puede exceder los 255 caracteres.',
             'description.string' => 'La descripción debe ser una cadena de texto.',
+            'description.required' => 'La descripción es obligatoria.',
             'price.required' => 'El precio del producto es obligatorio.',
             'price.numeric' => 'El precio debe ser un número.',
             'price.min' => 'El precio debe ser al menos 0.',

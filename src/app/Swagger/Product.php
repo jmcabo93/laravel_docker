@@ -82,6 +82,10 @@ use OpenApi\Annotations as OA;
      *     @OA\Response(
      *         response=404,
      *         description="Producto no encontrado"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Producto no encontrado"
      *     )
      * )
 
@@ -136,11 +140,15 @@ use OpenApi\Annotations as OA;
      *     @OA\Response(
      *         response=404,
      *         description="Producto no encontrado"
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="No se puede eliminar el producto porque está asociado a una o más órdenes."
      *     )
      * )
      
      * @OA\Get(
-     *     path="/api/products/random",
+     *     path="/api/random_product",
      *     tags={"Productos"},
      *     summary="Obtiene un producto aleatorio",
      *     description="Devuelve un producto aleatorio de la base de datos.",

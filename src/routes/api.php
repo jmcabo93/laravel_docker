@@ -34,11 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rutas para el modelo OrderItem
     Route::apiResource('order-items', OrderItemController::class);
 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
-
     Route::post('logout', [AuthController::class, 'logout']);
+
+     
 
     Route::get('orders/{id}/cancel', [OrderController::class, 'cancel_order']);
     Route::get('orders/{id}/status', [OrderController::class, 'status_order']);
