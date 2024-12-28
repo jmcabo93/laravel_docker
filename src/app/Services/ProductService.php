@@ -25,7 +25,6 @@ class ProductService
      */
     public function getProductsPage($page)
     {   
-        $this->cacheService->clearCache();
         return $this->cacheService->getProductsPage($page, function () use ($page) {
             return $this->repository->paginate(10, $page); // Si no está en caché, obtener desde el repositorio
         });
